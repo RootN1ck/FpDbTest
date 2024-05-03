@@ -4,6 +4,7 @@ namespace FpDbTest;
 
 use Exception;
 use mysqli;
+use FpDbTest\TemplateParser;
 
 class Database implements DatabaseInterface
 {
@@ -16,11 +17,18 @@ class Database implements DatabaseInterface
 
     public function buildQuery(string $query, array $args = []): string
     {
-        throw new Exception();
+        $parser = new TemplateParser($this->mysqli,$args,$this->skip());
+        $result_query = $parser->parse($query);
+        $use_count_args = $parser->getConterReplace();
+        if (count($args) != $use_count_args) {
+            throw new Exception("Parser error: a different number of parameters are specified", 1);
+        }
+        return $result_query;
     }
 
     public function skip()
     {
-        throw new Exception();
+        return 1;
+        //throw new Exception();
     }
 }
